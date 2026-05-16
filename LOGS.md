@@ -20,3 +20,5 @@
 - 手順書形式：マークダウン（スクリーンショットは後日Yoheiが追加）
 - 事前構築リソース（setup.yaml）：CodeCommitリポジトリ、S3バケット、IAMロール群
 - EC2/Code Serverの構築はこのプロジェクトのスコープ外
+- CodeBuildプロジェクトは環境ごとに1つ（計2つ）
+- ここまでの変更はすべてdevelopブランチにマージ済み。次回はdevelopからfeatureブランチを切って作業する
