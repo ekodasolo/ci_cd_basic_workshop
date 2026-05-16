@@ -6,7 +6,7 @@
 |---|---|
 | T1: SAMアプリケーション実装 | [✓] 完了 |
 | T2: ユニットテスト実装 | [✓] 完了 |
-| T3: buildspec.yml作成 | [ ] 未着手 |
+| T3: buildspec.yml作成 | [✓] 完了 |
 | T4: 事前構築用CloudFormationテンプレート作成 | [ ] 未着手 |
 | T5: ハンズオン手順書作成 | [ ] 未着手 |
 
@@ -28,7 +28,7 @@ Lambdaハンドラーの正常系・異常系を検証する。
 - ステアリングファイル：`steering/steering-t2-tests.md`
 - 成果物：`tests/test_cities.py`, `tests/requirements.txt`
 
-### T3: buildspec.yml作成 [ ]
+### T3: buildspec.yml作成 [✓]
 
 CodeBuild用のbuildspec.ymlを作成する。
 完成版と、受講者向けの骨格版の2種類を用意する。

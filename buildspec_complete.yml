@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.12
+
+  pre_build:
+    commands:
+      - pip install -r tests/requirements.txt
+      - python -m pytest tests/
+
+  build:
+    commands:
+      - sam build
+      - sam package --s3-bucket ${S3_BUCKET} --output-template-file packaged.yaml
+
+artifacts:
+  files:
+    - packaged.yaml
