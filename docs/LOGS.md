@@ -89,3 +89,22 @@
 - `pre_build` 失敗時のビルド停止は `pytest` の exit code に任せる（明示的な `set -e` は導入しない）
 - `sam package` の `--s3-prefix` は指定しない、CodeBuild のキャッシュ機構は導入しない（学習対象から外れるため）
 - アーティファクト出力は `packaged.yaml` のみ（CloudFormationデプロイステージが参照）
+
+### 実施内容（T4: 事前構築用CloudFormationテンプレート作成）
+
+- T4 を `feature/t4-setup` ブランチで実施
+- ステアリングファイル `steering/steering-t4-setup.md` を作成し、設計判断6点をYoheiレビューで決定
+- `setup/setup.yaml` を実装（CodeCommit / S3 / build-role / pipeline-role / deploy-role / Outputs）
+- `cfn-lint` で静的検証クリーン（AWS server-side validate-template はSSO期限切れでスキップ）
+- DESIGN.md 事前構築リソース設計テーブルもロール呼称統一に合わせて更新
+
+### 決定事項（T4）
+
+- IAMロールの呼称は **build-role / pipeline-role / deploy-role** でプロジェクト全体統一（メモリにも記録）
+- IAMポリシーの粒度：AWS Managed Policy 主体 + 必要部分のみ Inline。ワークショップの主眼から外れないバランス
+- 環境分離：setup.yaml は dev/prod 共通インフラ1セット（ロールもS3バケットも共通）
+- パラメータ：`ProjectName`（デフォルト `cities-api`）のみ。`Environment` は SAM テンプレート側で制御
+- S3バケット名：`${ProjectName}-artifacts-${AWS::AccountId}-${AWS::Region}`（グローバル一意性）
+- S3クリーンアップ：`DeletionPolicy: Delete` + 手順書で空化案内（T5で扱う）
+- deploy-role の IAM権限：`IAMFullAccess` は使わず、SAM が動的生成する Lambda 実行ロール操作に必要な11アクションを列挙する Inline Policy で絞った
+- pipeline-role の `iam:PassRole` は deploy-role の ARN にスコープ（ロールチェーンの正しい設計として明示）
