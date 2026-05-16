@@ -199,6 +199,7 @@ CodeBuildの処理は以下の3フェーズで構成する：
 ```
 ci_cd_workshop/
 ├── README.md                    # ワークショップ概要
+├── CLAUDE.md                    # プロジェクトルール（Claude Codeが自動読み込み）
 ├── template.yaml                # SAMテンプレート
 ├── buildspec.yml                # CodeBuild用（骨格版、受講者が完成させる）
 ├── buildspec_complete.yml       # CodeBuild用（完成版、講師用参考）
@@ -212,18 +213,20 @@ ci_cd_workshop/
 ├── tests/
 │   ├── requirements.txt        # テスト用依存パッケージ（pytest）
 │   └── test_cities.py          # ユニットテスト
-├── docs/
-│   └── handson/
-│       ├── step1.md            # Step 1 手順書
-│       ├── step2.md            # Step 2 手順書
-│       ├── step3.md            # Step 3 手順書
-│       ├── step4.md            # Step 4 手順書
-│       └── step5.md            # Step 5 手順書
-├── SPEC.md                     # 仕様書
-├── DESIGN.md                   # 設計書
-├── TASKS.md                    # タスク管理
-├── LOGS.md                     # 作業ログ
-└── CLAUDE.md                   # プロジェクトルール
+├── docs/                       # プロジェクト製作者向けドキュメント
+│   ├── SPEC.md                 # 仕様書
+│   ├── DESIGN.md               # 設計書
+│   ├── TASKS.md                # タスク管理
+│   └── LOGS.md                 # 作業ログ
+├── handson/                    # ワークショップ受講者向けコンテンツ
+│   ├── step1.md                # Step 1 手順書
+│   ├── step2.md                # Step 2 手順書
+│   ├── step3.md                # Step 3 手順書
+│   ├── step4.md                # Step 4 手順書
+│   └── step5.md                # Step 5 手順書
+└── steering/
+    ├── steering-t1-sam-app.md  # T1のステアリングファイル
+    └── ...                     # T2〜T5のステアリングファイル
 ```
 
 ### ディレクトリの役割
@@ -233,11 +236,16 @@ ci_cd_workshop/
 | `src/cities/` | Lambdaアプリケーションコード |
 | `tests/` | ユニットテスト |
 | `setup/` | 事前構築用CloudFormationテンプレート |
-| `docs/handson/` | ハンズオン手順書 |
+| `docs/` | プロジェクト製作者向けドキュメント（仕様・設計・タスク・ログ） |
+| `handson/` | ワークショップ受講者向けコンテンツ（ハンズオン手順書） |
+| `steering/` | タスクごとのステアリングファイル |
 
 ### ファイル配置ルール
 
 - Lambdaのソースコードは `src/{関数名}/` 配下に配置
 - テストは `tests/` 直下に `test_` プレフィックスで配置
 - SAMテンプレートはリポジトリルートに配置
-- 手順書は `docs/handson/` に Step 番号で配置
+- 手順書は `handson/` に Step 番号で配置
+- 仕様書・設計書・タスク管理・作業ログは `docs/` 直下に配置
+- 個別タスクのステアリングファイルは `steering/` 配下に配置
+- CLAUDE.md だけは Claude Code が自動読み込みする都合上、リポジトリルートに配置
