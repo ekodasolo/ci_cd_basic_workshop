@@ -5,7 +5,7 @@
 | タスク | ステータス |
 |---|---|
 | T1: SAMアプリケーション実装 | [✓] 完了 |
-| T2: ユニットテスト実装 | [ ] 未着手 |
+| T2: ユニットテスト実装 | [✓] 完了 |
 | T3: buildspec.yml作成 | [ ] 未着手 |
 | T4: 事前構築用CloudFormationテンプレート作成 | [ ] 未着手 |
 | T5: ハンズオン手順書作成 | [ ] 未着手 |
@@ -20,7 +20,7 @@ SAMテンプレートとLambda関数を実装する。
 - ステアリングファイル：`steering/steering-t1-sam-app.md`
 - 成果物：`template.yaml`, `src/cities/app.py`, `src/cities/data.py`
 
-### T2: ユニットテスト実装 [ ]
+### T2: ユニットテスト実装 [✓]
 
 pytestによるユニットテストを実装する。
 Lambdaハンドラーの正常系・異常系を検証する。
