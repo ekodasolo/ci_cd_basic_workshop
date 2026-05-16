@@ -219,11 +219,13 @@ ci_cd_workshop/
 │   ├── TASKS.md                # タスク管理
 │   └── LOGS.md                 # 作業ログ
 ├── handson/                    # ワークショップ受講者向けコンテンツ
+│   ├── README.md               # ハンズオン全体ガイド・目次
 │   ├── step1.md                # Step 1 手順書
 │   ├── step2.md                # Step 2 手順書
 │   ├── step3.md                # Step 3 手順書
 │   ├── step4.md                # Step 4 手順書
-│   └── step5.md                # Step 5 手順書
+│   ├── step5.md                # Step 5 手順書
+│   └── cleanup.md              # ハンズオン後のクリーンアップ手順
 └── steering/
     ├── steering-t1-sam-app.md  # T1のステアリングファイル
     └── ...                     # T2〜T5のステアリングファイル
