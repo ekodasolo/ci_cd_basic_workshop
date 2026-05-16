@@ -108,3 +108,39 @@
 - S3クリーンアップ：`DeletionPolicy: Delete` + 手順書で空化案内（T5で扱う）
 - deploy-role の IAM権限：`IAMFullAccess` は使わず、SAM が動的生成する Lambda 実行ロール操作に必要な11アクションを列挙する Inline Policy で絞った
 - pipeline-role の `iam:PassRole` は deploy-role の ARN にスコープ（ロールチェーンの正しい設計として明示）
+
+### 実施内容（T5: ハンズオン手順書作成）
+
+- T5 を `feature/t5-handson-docs` ブランチで実施
+- ステアリングファイル `steering/steering-t5-handson-docs.md` を作成し、設計判断6点をYoheiレビューで決定
+- `handson/{README, step1〜5, cleanup}.md` の7ファイルを作成（合計約42KB）
+- 各Step共通の章立てテンプレ（目的/所要時間/前提/ゴール/手順/トラブルシューティング/まとめ）を採用
+- スクリーンショットは後日追加するためHTMLコメント形式（`<!-- screenshot: ... -->`）でプレースホルダ7箇所を埋め込み
+- DESIGN.md のリポジトリ構造定義に `README.md` / `cleanup.md` を追記
+- Yoheiレビューで、CodeCommit認証部分を「IAMユーザーのHTTPS Git Credentials発行」から「EC2インスタンスロール + git credential.helper」方式に書き換え
+
+### 決定事項（T5）
+
+- ファイル構成：7ファイル（README + step1〜5 + cleanup）。step5にcleanupを埋め込むより独立ファイルの方が「忘れずにクリーンアップ」を強調できる
+- 言語スタイル：です・ます調（受講者向けで丁寧さを保つ）
+- スクリーンショットプレースホルダ：`<!-- screenshot: ... -->`（マークダウン上不可視、`grep screenshot:` で全件抽出可能）
+- Step 5 のバグ仕込みシナリオ：`app.py` の `get_city_handler` で `CITIES.get("typo_" + city_id)` に書き換えるロジック改ざん方式
+- 承認体験：承認ボタンを押すだけのシンプル体験（SNS通知や複数承認者は時間オーバーリスクで採用せず）
+- CodeBuild / CodePipeline 構築方法：マネジメントコンソール手動（SPEC.md準拠）
+- CodeCommit認証方式：EC2インスタンスロール + `git config --global credential.helper '!aws codecommit credential-helper $@'`。個別IAMユーザーのHTTPS Git Credentials発行は不要（メモリにも記録）
+
+## プロジェクト完了
+
+T1〜T5 のすべてのタスクが完了し、ワークショップ教材一式が揃った：
+
+- SAMアプリ（template.yaml、src/cities/）
+- ユニットテスト（pytest.ini、tests/）
+- buildspec（buildspec.yml骨格 + buildspec_complete.yml）
+- 事前構築テンプレート（setup/setup.yaml）
+- ハンズオン手順書（handson/README + step1〜5 + cleanup）
+
+未対応の残作業：
+
+- 各Stepのスクリーンショット撮影・追加（後日Yoheiが対応）
+- 講師AWSアカウントで setup.yaml をデプロイした実機検証
+- ワークショップ本番運用での受講者フィードバック取り込み
