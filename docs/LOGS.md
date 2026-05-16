@@ -72,3 +72,20 @@
 - 都市数のアサートは `> 0` でゆるく見る。ワークショップでのテストの主眼は仕組み・考え方に慣れることで網羅性ではない（受講者が `nagoya` 等を追加してもテストが壊れない設計）
 - テスト依存パッケージは `pytest` のみ。バージョンピンせず最新を取り込む
 - `.gitignore` に `.pytest_cache/` を追加
+
+### 実施内容（T3: buildspec.yml作成）
+
+- T3 を `feature/t3-buildspec` ブランチで実施
+- ステアリングファイル `steering/steering-t3-buildspec.md` を作成し、設計判断4点をYoheiレビューで決定
+- `buildspec_complete.yml`（完成版）と `buildspec.yml`（骨格版）を実装
+- 両ファイルの YAML valid を確認、`pip install + pytest` / `sam build` のローカル実行で動作確認
+
+### 決定事項（T3）
+
+- buildspec のバージョンは `0.2`、Pythonランタイムは 3.12（SAMテンプレートと同じ）
+- 完成版コマンド: `pip install -r tests/requirements.txt` → `pytest tests/` → `sam build` → `sam package --s3-bucket ${S3_BUCKET} --output-template-file packaged.yaml`
+- 骨格版の `runtime-versions` は埋めておく（受講者の写経対象は「コマンド」に集中させる）
+- 骨格版の空 `commands:` は CodeBuild が許容しないため `echo "TODO: ..."` プレースホルダを置く
+- `pre_build` 失敗時のビルド停止は `pytest` の exit code に任せる（明示的な `set -e` は導入しない）
+- `sam package` の `--s3-prefix` は指定しない、CodeBuild のキャッシュ機構は導入しない（学習対象から外れるため）
+- アーティファクト出力は `packaged.yaml` のみ（CloudFormationデプロイステージが参照）

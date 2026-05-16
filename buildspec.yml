@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      # ランタイムバージョンは事前に指定済み
+      python: 3.12
+
+  pre_build:
+    commands:
+      # TODO: テスト用依存パッケージをインストールする
+      # TODO: ユニットテストを実行する
+      - echo "TODO: write pre_build commands here"
+
+  build:
+    commands:
+      # TODO: SAM build を実行する
+      # TODO: SAM package を実行し、S3 にアップロードして packaged.yaml を出力する
+      - echo "TODO: write build commands here"
+
+artifacts:
+  files:
+    # ビルド成果物としてパッケージ済みテンプレートを指定する（このまま）
+    - packaged.yaml
