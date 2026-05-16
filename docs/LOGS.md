@@ -57,3 +57,18 @@
 - ワークショップ受講者向けコンテンツ（ハンズオン手順書）は `handson/` 配下に配置。製作者向けと受講者向けを別ディレクトリで明確に分離する方針
 - 個別タスクのステアリングファイルは `steering/` 配下に集約（`tasks/` 案より、内容と一致する `steering/` を採用）
 - `CLAUDE.md` だけは Claude Code が自動読み込みする都合上ルート配置を維持
+
+### 実施内容（T2: ユニットテスト実装）
+
+- T2 を `feature/t2-tests` ブランチで実施
+- ステアリングファイル `steering/steering-t2-tests.md` を作成し、設計判断3点をYoheiレビューで決定
+- `pytest.ini`、`tests/{__init__.py,requirements.txt,test_cities.py}` を実装
+- `pytest -v` で 3 passed を確認
+
+### 決定事項（T2）
+
+- pytest設定ファイルは `pytest.ini` を採用（`pyproject.toml` 等は導入しない）
+- pytest が `app.py` をインポートできるよう `pytest.ini` に `pythonpath = src/cities` を宣言
+- 都市数のアサートは `> 0` でゆるく見る。ワークショップでのテストの主眼は仕組み・考え方に慣れることで網羅性ではない（受講者が `nagoya` 等を追加してもテストが壊れない設計）
+- テスト依存パッケージは `pytest` のみ。バージョンピンせず最新を取り込む
+- `.gitignore` に `.pytest_cache/` を追加

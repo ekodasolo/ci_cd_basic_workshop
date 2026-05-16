@@ -1,5 +1,6 @@
 .claude
 .venv
 .aws-sam/
+.pytest_cache/
 __pycache__/
 *.pyc
