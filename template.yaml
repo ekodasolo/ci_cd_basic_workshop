@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cities API - CI/CD workshop sample application
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+    Default: dev
+    Description: デプロイ先環境（dev / prod）
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 10
+    MemorySize: 128
+    Architectures:
+      - x86_64
+
+Resources:
+  CitiesApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub cities-api-${Environment}
+      StageName: !Ref Environment
+      EndpointConfiguration:
+        Type: REGIONAL
+
+  ListCitiesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub cities-list-${Environment}
+      CodeUri: src/cities/
+      Handler: app.list_cities_handler
+      Events:
+        ListCities:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CitiesApi
+            Path: /cities
+            Method: get
+
+  GetCityFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub cities-get-${Environment}
+      CodeUri: src/cities/
+      Handler: app.get_city_handler
+      Events:
+        GetCity:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CitiesApi
+            Path: /cities/{city_id}
+            Method: get
+
+Outputs:
+  ApiEndpoint:
+    Description: 都市情報APIのベースURL
+    Value: !Sub https://${CitiesApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}
+  ListCitiesFunctionName:
+    Description: 都市一覧取得Lambda関数名
+    Value: !Ref ListCitiesFunction
+  GetCityFunctionName:
+    Description: 個別都市取得Lambda関数名
+    Value: !Ref GetCityFunction
