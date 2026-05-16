@@ -188,9 +188,9 @@ CodeBuildの処理は以下の3フェーズで構成する：
 |---|---|---|
 | CodeCommitリポジトリ | ソースコード管理 | アプリコード・テスト・buildspec骨格をpush済み |
 | S3バケット | SAMアーティファクト格納 | パイプラインからのアーティファクト出力先 |
-| IAMロール（CodeBuild用） | CodeBuildの実行権限 | S3読み書き、CloudWatch Logs書き込み、SAM関連操作 |
-| IAMロール（CodePipeline用） | パイプラインの実行権限 | CodeCommit読み取り、CodeBuild起動、S3読み書き、CloudFormation操作 |
-| IAMロール（CloudFormation用） | デプロイの実行権限 | Lambda / API Gateway / IAM等のリソース作成・更新 |
+| build-role（IAM） | CodeBuildの実行権限 | S3読み書き、CloudWatch Logs書き込み |
+| pipeline-role（IAM） | パイプラインの実行権限 | CodeCommit読み取り、CodeBuild起動、S3読み書き、CloudFormation操作、deploy-role への PassRole |
+| deploy-role（IAM） | デプロイの実行権限 | Lambda / API Gateway リソース作成・更新、SAMが動的生成するLambda実行ロールのIAM操作（個別アクション列挙） |
 
 事前構築リソースはCloudFormationテンプレートで一括作成し、受講者が手動で作成する必要がないようにする。
 

@@ -7,7 +7,7 @@
 | T1: SAMアプリケーション実装 | [✓] 完了 |
 | T2: ユニットテスト実装 | [✓] 完了 |
 | T3: buildspec.yml作成 | [✓] 完了 |
-| T4: 事前構築用CloudFormationテンプレート作成 | [ ] 未着手 |
+| T4: 事前構築用CloudFormationテンプレート作成 | [✓] 完了 |
 | T5: ハンズオン手順書作成 | [ ] 未着手 |
 
 ## タスク一覧
@@ -36,7 +36,7 @@ CodeBuild用のbuildspec.ymlを作成する。
 - ステアリングファイル：`steering/steering-t3-buildspec.md`
 - 成果物：`buildspec.yml`（骨格版）, `buildspec_complete.yml`（完成版）
 
-### T4: 事前構築用CloudFormationテンプレート作成 [ ]
+### T4: 事前構築用CloudFormationテンプレート作成 [✓]
 
 ハンズオン環境の事前構築に使用するCloudFormationテンプレートを作成する。
 CodeCommitリポジトリ、S3バケット、IAMロール等を一括作成する。

@@ -1,0 +1,206 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CI/CDワークショップ用の事前構築リソース（CodeCommit、S3、IAMロール3種）
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: cities-api
+    Description: プロジェクト名。CodeCommitリポジトリ名、各種リソース名のベースに使用
+
+Resources:
+
+  # ===========================================================================
+  # CodeCommit リポジトリ
+  # ===========================================================================
+  Repository:
+    Type: AWS::CodeCommit::Repository
+    DeletionPolicy: Delete
+    Properties:
+      RepositoryName: !Ref ProjectName
+      RepositoryDescription: !Sub CI/CDワークショップ用 ${ProjectName} アプリのソースコード
+
+  # ===========================================================================
+  # S3 バケット（SAMアーティファクト格納）
+  # ===========================================================================
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Sub ${ProjectName}-artifacts-${AWS::AccountId}-${AWS::Region}
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 90
+
+  # ===========================================================================
+  # build-role: CodeBuild が引き受けるロール
+  # ===========================================================================
+  BuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-build-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      Policies:
+        - PolicyName: ArtifactsBucketAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt ArtifactsBucket.Arn
+                  - !Sub ${ArtifactsBucket.Arn}/*
+
+  # ===========================================================================
+  # pipeline-role: CodePipeline が引き受けるロール
+  # ===========================================================================
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-pipeline-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: PipelinePermissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: CodeCommitAccess
+                Effect: Allow
+                Action:
+                  - codecommit:GetBranch
+                  - codecommit:GetCommit
+                  - codecommit:GetUploadArchiveStatus
+                  - codecommit:UploadArchive
+                  - codecommit:CancelUploadArchive
+                  - codecommit:GitPull
+                Resource: !GetAtt Repository.Arn
+              - Sid: CodeBuildAccess
+                Effect: Allow
+                Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                Resource: '*'
+              - Sid: ArtifactsBucketAccess
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt ArtifactsBucket.Arn
+                  - !Sub ${ArtifactsBucket.Arn}/*
+              - Sid: CloudFormationDeploy
+                Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStacks
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteChangeSet
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:SetStackPolicy
+                Resource: '*'
+              - Sid: PassDeployRole
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !GetAtt DeployRole.Arn
+
+  # ===========================================================================
+  # deploy-role: CloudFormation がデプロイ時に引き受けるロール
+  # ===========================================================================
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-deploy-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      Policies:
+        - PolicyName: IAMForSamLambdaRoles
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: IamRoleManagementForSamGeneratedRoles
+                Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:GetRole
+                  - iam:PassRole
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:TagRole
+                  - iam:UntagRole
+                  - iam:UpdateAssumeRolePolicy
+                Resource: '*'
+        - PolicyName: ArtifactsBucketRead
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource: !Sub ${ArtifactsBucket.Arn}/*
+
+Outputs:
+  CodeCommitCloneUrlHttp:
+    Description: CodeCommitリポジトリのHTTPSクローンURL
+    Value: !GetAtt Repository.CloneUrlHttp
+  CodeCommitRepositoryName:
+    Description: CodeCommitリポジトリ名
+    Value: !GetAtt Repository.Name
+  ArtifactsBucketName:
+    Description: SAMアーティファクト格納用S3バケット名（CodeBuildプロジェクトのS3_BUCKET環境変数に設定する）
+    Value: !Ref ArtifactsBucket
+  BuildRoleArn:
+    Description: CodeBuildプロジェクトに設定する build-role の ARN
+    Value: !GetAtt BuildRole.Arn
+  PipelineRoleArn:
+    Description: CodePipeline に設定する pipeline-role の ARN
+    Value: !GetAtt PipelineRole.Arn
+  DeployRoleArn:
+    Description: CodePipeline の CloudFormation デプロイアクションに設定する deploy-role の ARN
+    Value: !GetAtt DeployRole.Arn
