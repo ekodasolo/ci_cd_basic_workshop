@@ -41,3 +41,19 @@
 - コード配置：2関数とも `CodeUri: src/cities/` を共有し `Handler` だけ変える。`data.py` を関数間で共有しつつ Lambda Layer を導入しない（ワークショップの学習対象から外れるノイズを避けるため）
 - `sam local start-api` ハマりポイント：AWS SSOセッション期限切れ時、SAM CLIがLambdaコンテナへcredentials注入で失敗し502。今回のLambdaはAWS APIを呼ばないので、`AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy` を渡して回避可能。T5手順書での扱いは別途検討
 - `.gitignore` に `.aws-sam/`、`__pycache__/`、`*.pyc` を追加（ビルド生成物・キャッシュ）
+
+### 実施内容（プロジェクト構造の整理）
+
+- T2以降で増えるファイルに備えてルート直下を整理（`feature/restructure-docs` ブランチ）
+- `SPEC/DESIGN/TASKS/LOGS.md` を `docs/` 配下に移動
+- `steering-t1-sam-app.md` を `steering/` 配下に移動
+- 受講者向けコンテンツ置き場を `docs/handson/` から `handson/`（リポジトリ直下）に変更（実体はT5で作成）
+- `CLAUDE.md` にドキュメント配置セクションを新設し、各ファイル参照のパスを更新
+- `docs/DESIGN.md` のリポジトリ構造定義（ツリー・役割・配置ルール）を刷新
+
+### 決定事項（プロジェクト構造）
+
+- プロジェクト製作者向けドキュメント（仕様・設計・タスク・ログ）は `docs/` 配下に集約
+- ワークショップ受講者向けコンテンツ（ハンズオン手順書）は `handson/` 配下に配置。製作者向けと受講者向けを別ディレクトリで明確に分離する方針
+- 個別タスクのステアリングファイルは `steering/` 配下に集約（`tasks/` 案より、内容と一致する `steering/` を採用）
+- `CLAUDE.md` だけは Claude Code が自動読み込みする都合上ルート配置を維持
