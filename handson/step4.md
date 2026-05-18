@@ -2,7 +2,7 @@
 
 ## このStepの目的
 
-`main` ブランチへのpushをトリガに、本番環境（`cities-api-prod`）へデプロイする本番パイプラインを構築します。Step 3 の開発パイプラインとの大きな違いは、デプロイ前に **手動承認ステージ** が入る点で、本番反映を人間の判断で制御する仕組みを体験します。
+`main` ブランチへのpushをトリガに、本番環境（`cities-api-prod-<UserName>`）へデプロイする本番パイプラインを構築します。Step 3 の開発パイプラインとの大きな違いは、デプロイ前に **手動承認ステージ** が入る点で、本番反映を人間の判断で制御する仕組みを体験します。
 
 ## 所要時間
 
@@ -40,12 +40,12 @@ Step 3 の手順とほぼ同じですが、名前とブランチが異なりま�
 
 1. AWSマネジメントコンソールで **CodeBuild** → **Create project**
 2. 以下を設定（Step 3 と異なる箇所のみ太字）：
-   - **Project name**: **`cities-api-build-prod`**
+   - **Project name**: **`cities-api-build-prod-<UserName>`**
    - **Source provider**: AWS CodeCommit
-   - **Repository**: `cities-api`
+   - **Repository**: `cities-api-<UserName>`
    - **Branch**: **`main`**
    - **Environment image**: Step 3 と同じ Amazon Linux 2 / Standard / 最新イメージ
-   - **Service role**: Existing service role → `cities-api-build-role`
+   - **Service role**: Existing service role → `cities-api-build-role-<UserName>`
    - **Environment variables**:
      - Name: `S3_BUCKET` / Value: Outputsの `ArtifactsBucketName` の値
    - **Buildspec name**: `buildspec.yml`
@@ -59,28 +59,28 @@ build-role / S3バケットは開発環境と共通なので、新しいIAMロ�
 1. AWSマネジメントコンソールで **CodePipeline** → **Create pipeline**
 
    **Step 1: Choose pipeline settings**
-   - **Pipeline name**: `cities-api-pipeline-prod`
-   - **Service role**: Existing service role → `cities-api-pipeline-role`
+   - **Pipeline name**: `cities-api-pipeline-prod-<UserName>`
+   - **Service role**: Existing service role → `cities-api-pipeline-role-<UserName>`
    - **Artifact store**: Custom location → Outputsの `ArtifactsBucketName` の値
 
    **Step 2: Add source stage**
    - **Source provider**: AWS CodeCommit
-   - **Repository name**: `cities-api`
+   - **Repository name**: `cities-api-<UserName>`
    - **Branch name**: **`main`**
 
    **Step 3: Add build stage**
    - **Build provider**: AWS CodeBuild
-   - **Project name**: **`cities-api-build-prod`**
+   - **Project name**: **`cities-api-build-prod-<UserName>`**
 
    **Step 4: Add deploy stage**
    - **Deploy provider**: AWS CloudFormation
    - **Action mode**: Create or update a stack
-   - **Stack name**: **`cities-api-prod`**
+   - **Stack name**: **`cities-api-prod-<UserName>`**
    - **Artifact name**: BuildArtifact
    - **Template file**: `packaged.yaml`
    - **Capabilities**: `CAPABILITY_IAM`
-   - **Role name**: `cities-api-deploy-role`
-   - **Parameter overrides**: **`{ "Environment": "prod" }`**
+   - **Role name**: `cities-api-deploy-role-<UserName>`
+   - **Parameter overrides**: **`{ "Environment": "prod", "UserName": "<UserName>" }`**
 
 2. **Create pipeline** をクリック
 
@@ -88,7 +88,7 @@ build-role / S3バケットは開発環境と共通なので、新しいIAMロ�
 
 パイプライン作成直後はSource → Build → Deployの3ステージしかありません。Build と Deploy の間に手動承認ステージを差し込みます。
 
-1. 作成した `cities-api-pipeline-prod` の画面で右上の **Edit** をクリック
+1. 作成した `cities-api-pipeline-prod-<UserName>` の画面で右上の **Edit** をクリック
 2. Build ステージと Deploy ステージの間にある **+ Add stage** をクリック
 3. **Stage name**: `Approval` を入力 → **Add stage**
 4. 新しいApprovalステージの中で **+ Add action group** をクリック
@@ -111,7 +111,7 @@ git commit -m "Trigger prod pipeline"
 git push origin main
 ```
 
-`cities-api-pipeline-prod` 画面に戻ると：
+`cities-api-pipeline-prod-<UserName>` 画面に戻ると：
 
 - **Source**: Succeeded
 - **Build**: 実行中 → Succeeded
@@ -123,13 +123,13 @@ git push origin main
 2. ダイアログで **Approve** を選択（必要ならコメントを入力）
 3. **Submit** をクリック
 
-承認後、Deploy ステージが動き出し、CloudFormation が `cities-api-prod` スタックを作成します。
+承認後、Deploy ステージが動き出し、CloudFormation が `cities-api-prod-<UserName>` スタックを作成します。
 
 <!-- screenshot: 手動承認ダイアログ（Approve/Reject選択画面） -->
 
 ### 7. 本番環境のAPIエンドポイントを確認する
 
-1. **CloudFormation** → `cities-api-prod` スタック → **Outputs** タブ
+1. **CloudFormation** → `cities-api-prod-<UserName>` スタック → **Outputs** タブ
 2. `ApiEndpoint` の値をコピー
 3. curlで動作確認：
 
@@ -145,9 +145,10 @@ curl https://yyyy.execute-api.region.amazonaws.com/prod/cities/tokyo
 | 項目 | 開発パイプライン | 本番パイプライン |
 |---|---|---|
 | Source ブランチ | develop | main |
-| CodeBuildプロジェクト | cities-api-build-dev | cities-api-build-prod |
-| CloudFormationスタック | cities-api-dev | cities-api-prod |
+| CodeBuildプロジェクト | cities-api-build-dev-&lt;UserName&gt; | cities-api-build-prod-&lt;UserName&gt; |
+| CloudFormationスタック | cities-api-dev-&lt;UserName&gt; | cities-api-prod-&lt;UserName&gt; |
 | Environment パラメータ | dev | prod |
+| UserName パラメータ | 自分のUserName | 自分のUserName（同じ値） |
 | 手動承認ステージ | なし | あり |
 
 「人間の判断を挟むかどうか」だけで、自動化のメリットを残しつつ本番反映の安全性を高められるのが手動承認ステージの効用です。
@@ -158,8 +159,8 @@ curl https://yyyy.execute-api.region.amazonaws.com/prod/cities/tokyo
 |---|---|---|
 | Approvalステージで承認ボタンが押せない | 承認担当者のIAMユーザーに `codepipeline:PutApprovalResult` 権限がない | 自分のIAMユーザーに該当ポリシーを付与（講師に相談） |
 | Approval後にDeployが `AccessDenied` | deploy-role の権限不足 | 事前構築スタックのIAM設定を講師に確認 |
-| `cities-api-prod` スタックがロールバックされる | SAMテンプレートのリソース命名衝突（dev/prodで同名リソース） | `template.yaml` の `FunctionName` などに `${Environment}` が含まれているか確認 |
-| Parameter overrides が反映されない | `Environment=prod` のスペルミス、または引用符の付け方 | コンソールの該当欄に `Environment=prod`（前後に余分な空白なし）で入力 |
+| `cities-api-prod-<UserName>` スタックがロールバックされる | SAMテンプレートのリソース命名衝突（dev/prodで同名リソース、または他ユーザーのリソース名と衝突） | `template.yaml` の `FunctionName` などに `${Environment}` と `${UserName}` の両方が含まれているか、また `Parameter overrides` で正しい `UserName` を渡しているか確認 |
+| Parameter overrides が反映されない | `Environment`/`UserName` のスペルミス、引用符の付け方、または JSON 構文エラー | `{ "Environment": "prod", "UserName": "<UserName>" }` の形式を再確認（キーは大文字小文字一致、`UserName` は自分の値に置換） |
 
 ## Stepのまとめ
 

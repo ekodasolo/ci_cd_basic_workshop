@@ -144,3 +144,21 @@ T1〜T5 のすべてのタスクが完了し、ワークショップ教材一式
 - 各Stepのスクリーンショット撮影・追加（後日Yoheiが対応）
 - 講師AWSアカウントで setup.yaml をデプロイした実機検証
 - ワークショップ本番運用での受講者フィードバック取り込み
+
+## 2026-05-18
+
+### 実施内容
+
+- T6（複数ユーザー共存対応）を `feature/multi-user-coexistence` ブランチで実施
+- 講師と受講者が同一AWSアカウント・同一リージョンで並立できるよう、全リソース名に `UserName` サフィックスを付与
+- `setup/setup.yaml` と `template.yaml` に `UserName` パラメータを追加し、CodeCommit / S3 / IAMロール3種 / Lambda関数 / API Gateway の名前を更新
+- handson 全ファイル（README、step1〜5、cleanup）のリソース名参照を `<UserName>` サフィックス付きに書き換え、CFN Deploy アクションの `Parameter overrides` にも `UserName` を追加
+- `sam validate --lint` で両テンプレートを検証
+
+### 決定事項
+
+- `UserName` の制約：英小文字＋数字、1〜8文字（`^[a-z0-9]+$`、S3バケット名のグローバル一意制約に合わせた文字種、IAMロール名 64 文字制限のマージン確保のための長さ制限）
+- 命名位置：サフィックス（既存リソース名の末尾に `-${UserName}` を付ける）。`Environment`（dev/prod）サフィックスがある場合は、`<Environment>` の後ろに `<UserName>` を置く（ユーザー名は常に末尾）
+- `UserName` パラメータに Default は設けない：明示入力を必須化し、複数ユーザー運用を意識させる
+- 受講者環境のEC2インスタンスロール（CodeCommit権限）は影響なし：リポジトリARN指定ではなく `*` 想定との Yohei 確認による
+- 既存の事前構築済みCloudFormationスタックがある場合は新仕様でデプロイし直しが必要。buildspec.yml は環境変数 `S3_BUCKET` で受け取るため変更不要

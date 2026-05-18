@@ -78,7 +78,7 @@ git push origin develop
 
 ### 4. 開発パイプラインの実行を確認する
 
-CodePipeline画面で `cities-api-pipeline-dev` を開き、Source → Build → Deploy が順に Succeeded になることを確認します。
+CodePipeline画面で `cities-api-pipeline-dev-<UserName>` を開き、Source → Build → Deploy が順に Succeeded になることを確認します。
 
 完了後、開発環境のAPIに名古屋が含まれていることを確認：
 
@@ -185,7 +185,7 @@ git push origin develop
 
 ### 4. パイプラインが成功して開発環境が更新される
 
-CodePipeline画面で `cities-api-pipeline-dev` を確認すると、今度は Source → Build → Deploy すべて Succeeded になります。
+CodePipeline画面で `cities-api-pipeline-dev-<UserName>` を確認すると、今度は Source → Build → Deploy すべて Succeeded になります。
 
 curl で開発環境を確認：
 
@@ -200,7 +200,7 @@ curl https://xxxx.execute-api.region.amazonaws.com/dev/cities/tokyo
 |---|---|---|
 | シナリオ1で名古屋を追加したのに `/cities` のレスポンスに反映されない | パイプラインが完了する前にcurlした、もしくはAPI Gatewayのキャッシュ | 1-2分待ってから再度curl |
 | シナリオ2でpushしたのに Build が成功してしまう | `buildspec.yml` の `pre_build` で `pytest` が実行されていない（写経漏れ） | `buildspec.yml` を `buildspec_complete.yml` と diff で比較 |
-| シナリオ2の Build ログを開いてもエラー内容が見えない | ログのフィルタが厳しい | CloudWatch Logs Insights で `/aws/codebuild/cities-api-build-dev` を直接開くと全文見える |
+| シナリオ2の Build ログを開いてもエラー内容が見えない | ログのフィルタが厳しい | CloudWatch Logs Insights で `/aws/codebuild/cities-api-build-dev-<UserName>` を直接開くと全文見える |
 
 ## このハンズオン全体のまとめ
 
