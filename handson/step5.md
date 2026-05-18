@@ -29,6 +29,11 @@
 
 ### 1. data.py を編集する
 
+次の作業に備えて、作業ブランチはdevelopに戻しておきます。
+```bash
+git switch develop
+```
+
 `src/cities/data.py` を以下のように編集します。`osaka` の後ろに `nagoya` を追加します：
 
 ```python

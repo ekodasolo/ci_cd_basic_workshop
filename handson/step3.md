@@ -76,7 +76,7 @@ git push origin develop
 ### 2. CodeBuildプロジェクトを作成する（開発環境用）
 
 1. AWSマネジメントコンソールで **CodeBuild** を開きます
-2. 左ナビ：**Build projects** → **Create build project** をクリック
+2. 左ナビ：**Build projects** → **Create project** をクリック
 3. 以下を設定します：
 
    **Project configuration**
@@ -92,7 +92,7 @@ git push origin develop
    **Environment**
    - **Provisioning model**: On-demand
    - **Environment image**: Managed image
-   - **Operating system**: Amazon Linux 2
+   - **Operating system**: Amazon Linux
    - **Runtime(s)**: Standard
    - **Image**: 最新のaws/codebuild/amazonlinux2-x86_64-standardイメージを選択
    - **Service role**: **Existing service role** を選択 → ロール名から `cities-api-build-role` を選択
@@ -120,11 +120,12 @@ git push origin develop
 
 1. AWSマネジメントコンソールで **CodePipeline** を開きます
 2. **Create pipeline** をクリック
+3. **Category**: Build costom pipeline を選んで次へ
 
    **Step 1: Choose pipeline settings**
    - **Pipeline name**: `cities-api-pipeline-dev`
    - **Service role**: **Existing service role** を選択 → ロール名から `cities-api-pipeline-role` を選択
-   - **Artifact store**: **Custom location** を選択 → Bucket に `cities-api-artifacts-<AccountID>-<Region>`（Outputsの `ArtifactsBucketName` の値）
+   - **Advanced settings**を展開し、 **Artifact store**: **Custom location** を選択 → Bucket に `cities-api-artifacts-<AccountID>-<Region>`（Outputsの `ArtifactsBucketName` の値）
 
    **Step 2: Add source stage**
    - **Source provider**: AWS CodeCommit
@@ -141,13 +142,13 @@ git push origin develop
    - **Action mode**: Create or update a stack
    - **Stack name**: `cities-api-dev`
    - **Artifact name**: BuildArtifact
-   - **Template file**: `packaged.yaml`
+   - **Template file**: `BuildArtifact`の`packaged.yaml`
    - **Capabilities**: `CAPABILITY_IAM`（SAMが Lambda 実行ロールを作成するため必須）
    - **Role name**: ロール名から `cities-api-deploy-role` を選択（Outputsの `DeployRoleArn` の値）
    - **Advanced** セクションを開く：
-     - **Parameter overrides**: `Environment=dev`
+     - **Parameter overrides**: `{"Environment": "dev"}`
 
-3. **Create pipeline** をクリック
+4. **Create pipeline** をクリック
 
 作成と同時に1回目のパイプライン実行が走ります。
 

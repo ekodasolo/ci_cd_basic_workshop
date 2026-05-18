@@ -27,7 +27,7 @@
 Step 3 で `buildspec.yml` を完成させた変更が `develop` にのみ反映されています。本番パイプラインで使えるよう `main` にもマージします：
 
 ```bash
-git checkout main
+git switch main
 git merge develop
 git push origin main
 ```
@@ -38,7 +38,7 @@ git push origin main
 
 Step 3 の手順とほぼ同じですが、名前とブランチが異なります。
 
-1. AWSマネジメントコンソールで **CodeBuild** → **Create build project**
+1. AWSマネジメントコンソールで **CodeBuild** → **Create project**
 2. 以下を設定（Step 3 と異なる箇所のみ太字）：
    - **Project name**: **`cities-api-build-prod`**
    - **Source provider**: AWS CodeCommit
@@ -80,7 +80,7 @@ build-role / S3バケットは開発環境と共通なので、新しいIAMロ�
    - **Template file**: `packaged.yaml`
    - **Capabilities**: `CAPABILITY_IAM`
    - **Role name**: `cities-api-deploy-role`
-   - **Parameter overrides**: **`Environment=prod`**
+   - **Parameter overrides**: **`{ "Environment": "prod" }`**
 
 2. **Create pipeline** をクリック
 
@@ -115,11 +115,11 @@ git push origin main
 
 - **Source**: Succeeded
 - **Build**: 実行中 → Succeeded
-- **Approval**: **承認待ち**（黄色）
+- **Approval**: **In Progress**
 
 ### 6. 承認して本番デプロイを実行する
 
-1. Approval ステージの **Review** をクリック
+1. Approval ステージの **ManualApproval** をクリック
 2. ダイアログで **Approve** を選択（必要ならコメントを入力）
 3. **Submit** をクリック
 
