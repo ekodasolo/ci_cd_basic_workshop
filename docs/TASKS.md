@@ -9,6 +9,7 @@
 | T3: buildspec.yml作成 | [✓] 完了 |
 | T4: 事前構築用CloudFormationテンプレート作成 | [✓] 完了 |
 | T5: ハンズオン手順書作成 | [✓] 完了 |
+| T6: 複数ユーザー共存対応 | [✓] 完了 |
 
 ## タスク一覧
 
@@ -51,3 +52,10 @@ Step 1〜5の手順書を作成する。
 
 - ステアリングファイル：`steering/steering-t5-handson-docs.md`
 - 成果物：`docs/handson/step1.md` 〜 `step5.md`
+
+### T6: 複数ユーザー共存対応 [✓]
+
+同一AWSアカウント・同一リージョンで講師と受講者が並立して作業できるよう、全リソース名に `UserName` サフィックスを付与する。
+
+- ステアリングファイル：`steering/steering-t6-multi-user.md`
+- 成果物：`setup/setup.yaml`、`template.yaml`、`docs/SPEC.md`、`docs/DESIGN.md`、`handson/*.md`（命名規約反映）

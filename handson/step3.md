@@ -80,12 +80,12 @@ git push origin develop
 3. 以下を設定します：
 
    **Project configuration**
-   - **Project name**: `cities-api-build-dev`
+   - **Project name**: `cities-api-build-dev-<UserName>`
    - **Description**: （任意）
 
    **Source**
    - **Source provider**: AWS CodeCommit
-   - **Repository**: `cities-api`
+   - **Repository**: `cities-api-<UserName>`
    - **Reference type**: Branch
    - **Branch**: `develop`
 
@@ -95,7 +95,7 @@ git push origin develop
    - **Operating system**: Amazon Linux
    - **Runtime(s)**: Standard
    - **Image**: 最新のaws/codebuild/amazonlinux2-x86_64-standardイメージを選択
-   - **Service role**: **Existing service role** を選択 → ロール名から `cities-api-build-role` を選択
+   - **Service role**: **Existing service role** を選択 → ロール名から `cities-api-build-role-<UserName>` を選択
    - **Allow AWS CodeBuild to modify this service role so it can be used with this build project** のチェックを **外す**（既存ロールをそのまま使うため）
 
    **Additional configuration**（Environment内）
@@ -123,30 +123,30 @@ git push origin develop
 3. **Category**: Build costom pipeline を選んで次へ
 
    **Step 1: Choose pipeline settings**
-   - **Pipeline name**: `cities-api-pipeline-dev`
-   - **Service role**: **Existing service role** を選択 → ロール名から `cities-api-pipeline-role` を選択
-   - **Advanced settings**を展開し、 **Artifact store**: **Custom location** を選択 → Bucket に `cities-api-artifacts-<AccountID>-<Region>`（Outputsの `ArtifactsBucketName` の値）
+   - **Pipeline name**: `cities-api-pipeline-dev-<UserName>`
+   - **Service role**: **Existing service role** を選択 → ロール名から `cities-api-pipeline-role-<UserName>` を選択
+   - **Advanced settings**を展開し、 **Artifact store**: **Custom location** を選択 → Bucket に `cities-api-artifacts-<AccountID>-<Region>-<UserName>`（Outputsの `ArtifactsBucketName` の値）
 
    **Step 2: Add source stage**
    - **Source provider**: AWS CodeCommit
-   - **Repository name**: `cities-api`
+   - **Repository name**: `cities-api-<UserName>`
    - **Branch name**: `develop`
    - **Detection mode**: Amazon CloudWatch Events（推奨）
 
    **Step 3: Add build stage**
    - **Build provider**: AWS CodeBuild
-   - **Project name**: `cities-api-build-dev`
+   - **Project name**: `cities-api-build-dev-<UserName>`
 
    **Step 4: Add deploy stage**
    - **Deploy provider**: AWS CloudFormation
    - **Action mode**: Create or update a stack
-   - **Stack name**: `cities-api-dev`
+   - **Stack name**: `cities-api-dev-<UserName>`
    - **Artifact name**: BuildArtifact
    - **Template file**: `BuildArtifact`の`packaged.yaml`
    - **Capabilities**: `CAPABILITY_IAM`（SAMが Lambda 実行ロールを作成するため必須）
-   - **Role name**: ロール名から `cities-api-deploy-role` を選択（Outputsの `DeployRoleArn` の値）
+   - **Role name**: ロール名から `cities-api-deploy-role-<UserName>` を選択（Outputsの `DeployRoleArn` の値）
    - **Advanced** セクションを開く：
-     - **Parameter overrides**: `{"Environment": "dev"}`
+     - **Parameter overrides**: `{"Environment": "dev", "UserName": "<UserName>"}`
 
 4. **Create pipeline** をクリック
 
@@ -156,17 +156,17 @@ git push origin develop
 
 ### 4. パイプラインの実行状況を確認する
 
-CodePipeline画面で `cities-api-pipeline-dev` を開き、各ステージの進捗を確認します：
+CodePipeline画面で `cities-api-pipeline-dev-<UserName>` を開き、各ステージの進捗を確認します：
 
 - **Source**: 数十秒で Succeeded
 - **Build**: 数分かかります。失敗する場合は CodeBuild の `View logs` でログを確認
-- **Deploy**: CloudFormation が `cities-api-dev` スタックを作成・更新します
+- **Deploy**: CloudFormation が `cities-api-dev-<UserName>` スタックを作成・更新します
 
 すべて Succeeded（緑）になれば開発環境にデプロイ完了です。
 
 ### 5. 開発環境のAPIエンドポイントを確認する
 
-1. **CloudFormation** を開き、`cities-api-dev` スタック → **Outputs** タブ
+1. **CloudFormation** を開き、`cities-api-dev-<UserName>` スタック → **Outputs** タブ
 2. `ApiEndpoint` の値（`https://xxxx.execute-api.region.amazonaws.com/dev` の形式）をコピー
 3. ターミナルで curl してみます：
 

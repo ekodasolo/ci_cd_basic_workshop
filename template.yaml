@@ -10,6 +10,12 @@ Parameters:
       - prod
     Default: dev
     Description: デプロイ先環境（dev / prod）
+  UserName:
+    Type: String
+    MinLength: 1
+    MaxLength: 8
+    AllowedPattern: '^[a-z0-9]+$'
+    Description: ユーザー識別子（英小文字+数字、8文字以内）。同一AWSアカウント・同一リージョンで複数ユーザーが共存できるよう、リソース名の末尾にサフィックスとして付与される
 
 Globals:
   Function:
@@ -23,7 +29,7 @@ Resources:
   CitiesApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub cities-api-${Environment}
+      Name: !Sub cities-api-${Environment}-${UserName}
       StageName: !Ref Environment
       EndpointConfiguration:
         Type: REGIONAL
@@ -31,7 +37,7 @@ Resources:
   ListCitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub cities-list-${Environment}
+      FunctionName: !Sub cities-list-${Environment}-${UserName}
       CodeUri: src/cities/
       Handler: app.list_cities_handler
       Events:
@@ -45,7 +51,7 @@ Resources:
   GetCityFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub cities-get-${Environment}
+      FunctionName: !Sub cities-get-${Environment}-${UserName}
       CodeUri: src/cities/
       Handler: app.get_city_handler
       Events:

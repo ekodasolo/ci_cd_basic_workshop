@@ -6,6 +6,12 @@ Parameters:
     Type: String
     Default: cities-api
     Description: プロジェクト名。CodeCommitリポジトリ名、各種リソース名のベースに使用
+  UserName:
+    Type: String
+    MinLength: 1
+    MaxLength: 8
+    AllowedPattern: '^[a-z0-9]+$'
+    Description: ユーザー識別子（英小文字+数字、8文字以内）。同一AWSアカウント・同一リージョンで複数ユーザーが共存できるよう、全リソース名の末尾にサフィックスとして付与される
 
 Resources:
 
@@ -16,8 +22,8 @@ Resources:
     Type: AWS::CodeCommit::Repository
     DeletionPolicy: Delete
     Properties:
-      RepositoryName: !Ref ProjectName
-      RepositoryDescription: !Sub CI/CDワークショップ用 ${ProjectName} アプリのソースコード
+      RepositoryName: !Sub ${ProjectName}-${UserName}
+      RepositoryDescription: !Sub CI/CDワークショップ用 ${ProjectName} アプリのソースコード（${UserName}）
 
   # ===========================================================================
   # S3 バケット（SAMアーティファクト格納）
@@ -26,7 +32,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
-      BucketName: !Sub ${ProjectName}-artifacts-${AWS::AccountId}-${AWS::Region}
+      BucketName: !Sub ${ProjectName}-artifacts-${AWS::AccountId}-${AWS::Region}-${UserName}
       VersioningConfiguration:
         Status: Enabled
       BucketEncryption:
@@ -50,7 +56,7 @@ Resources:
   BuildRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${ProjectName}-build-role
+      RoleName: !Sub ${ProjectName}-build-role-${UserName}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -80,7 +86,7 @@ Resources:
   PipelineRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${ProjectName}-pipeline-role
+      RoleName: !Sub ${ProjectName}-pipeline-role-${UserName}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -143,7 +149,7 @@ Resources:
   DeployRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${ProjectName}-deploy-role
+      RoleName: !Sub ${ProjectName}-deploy-role-${UserName}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

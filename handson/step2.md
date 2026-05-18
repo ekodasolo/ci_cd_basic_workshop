@@ -29,7 +29,7 @@ CloudFormationの事前構築スタックの **Outputs** タブを開き、以�
 | Outputs名 | 用途 |
 |---|---|
 | `CodeCommitCloneUrlHttp` | リポジトリのHTTPSクローンURL |
-| `CodeCommitRepositoryName` | リポジトリ名（`cities-api`） |
+| `CodeCommitRepositoryName` | リポジトリ名（`cities-api-<UserName>`） |
 
 <!-- screenshot: CloudFormationスタック詳細のOutputsタブ -->
 
@@ -92,7 +92,7 @@ git switch develop
 ### 4. CodeCommitコンソールでpushを確認する
 
 1. AWSマネジメントコンソールで **CodeCommit** を開きます
-2. 左ナビ：**Repositories** → `cities-api` をクリック
+2. 左ナビ：**Repositories** → `cities-api-<UserName>` をクリック
 3. 画面上部のブランチセレクタで `develop` / `main` を切り替え、両方にコードがあることを確認
 
 <!-- screenshot: CodeCommitリポジトリのコード一覧画面（developブランチ表示） -->
@@ -101,8 +101,8 @@ git switch develop
 
 このハンズオンでは2ブランチで開発・本番を分離します：
 
-- **develop ブランチ**：開発環境（`cities-api-dev` スタック）へのデプロイをトリガ
-- **main ブランチ**：本番環境（`cities-api-prod` スタック）へのデプロイをトリガ（手動承認あり）
+- **develop ブランチ**：開発環境（`cities-api-dev-<UserName>` スタック）へのデプロイをトリガ
+- **main ブランチ**：本番環境（`cities-api-prod-<UserName>` スタック）へのデプロイをトリガ（手動承認あり）
 
 実際のチーム開発ではここに feature ブランチや PR レビューが加わりますが、本ハンズオンの主眼は「ブランチによって異なる環境へデプロイされる」体験です。
 
@@ -112,7 +112,7 @@ git switch develop
 |---|---|---|
 | `git push` で `fatal: unable to access ... The requested URL returned error: 403` | EC2インスタンスロールにCodeCommitへの権限がない、またはcredential helperが効いていない | `aws sts get-caller-identity` でインスタンスロールが認識されているか、`git config --global --list \| grep credential` でhelper設定が入っているか確認 |
 | `git push` で credential helper が呼ばれず認証ダイアログが出る | `git config` の設定が反映されていない | `git config --global --list` で `credential.helper` と `credential.UseHttpPath` が出力されるか確認、出ない場合は手順2を再実行 |
-| クローンURLが `https://git-codecommit.region.amazonaws.com/v1/repos/cities-api` 形式でない | Outputsを取り違えた | CloudFormationスタックの正しいOutputs `CodeCommitCloneUrlHttp` を再確認 |
+| クローンURLが `https://git-codecommit.region.amazonaws.com/v1/repos/cities-api-<UserName>` 形式でない | Outputsを取り違えた | CloudFormationスタックの正しいOutputs `CodeCommitCloneUrlHttp` を再確認 |
 
 ## Stepのまとめ
 
