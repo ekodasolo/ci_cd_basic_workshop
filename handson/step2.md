@@ -56,6 +56,10 @@ git config --global credential.UseHttpPath true
 ```bash
 git init
 git add .
+
+# 最初のブランチがmasterで作られていたらmainに変更する
+git branch -m master main
+
 git commit -m "Initial commit"
 ```
 
@@ -77,7 +81,7 @@ credential helper が裏で認証を済ませてくれるので、ユーザー�
 次に `main` ブランチを作って push します：
 
 ```bash
-git checkout -b main
+git switch main
 git push -u origin main
 ```
 
