@@ -12,6 +12,7 @@
 
 - 作業環境に Python 3.12 / AWS SAM CLI / Docker / git がインストール済み
 - Docker Desktop（または同等のDocker環境）が起動している
+- 自分の **UserName**（英小文字＋数字、1〜8文字）が決まっている。詳細は [README](README.md#ユーザー名usernameの決定) を参照
 
 ## このStepのゴール
 

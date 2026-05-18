@@ -29,6 +29,15 @@ AWS CodeCommit / CodeBuild / CodePipeline を使って、Python + AWS SAM 製の
 - 講師が事前に `setup.yaml` をデプロイし、CodeCommitリポジトリ、S3バケット、IAMロール3種を作成していること
 - AWS CLI、SAM CLI、Python 3.12、Docker、Git が作業環境にインストールされていること
 
+## ユーザー名（UserName）の決定
+
+このハンズオンでは、講師と受講者が同一AWSアカウント・同一リージョンで作業します。リソース名の衝突を避けるため、受講者ごとに **UserName**（自分専用の識別子）を決めて、全リソース名のサフィックスとして付与します。
+
+- **形式**：英小文字＋数字のみ、1〜8文字（例：`yohei`、`user01`、`tanaka`）
+- **使い方**：本ガイドに登場する `<UserName>` という表記は、自分の UserName に読み替えてください
+  - 例：UserName が `yohei` の場合、`cities-api-<UserName>` → `cities-api-yohei`
+- 講師から指定された UserName がある場合はそれを使ってください。指定がなければ自分で決めて、ハンズオン中は一貫して同じ値を使い続けてください
+
 ## 事前構築リソースの確認
 
 ハンズオンを始める前に、以下の情報を講師から受け取るか、CloudFormationの事前構築スタックの **Outputs** タブから確認してください。各Stepで参照します。
@@ -49,5 +58,6 @@ AWS CodeCommit / CodeBuild / CodePipeline を使って、Python + AWS SAM 製の
 | **build-role** | CodeBuild が引き受けるIAMロール |
 | **pipeline-role** | CodePipeline が引き受けるIAMロール |
 | **deploy-role** | CloudFormation がデプロイ実行時に引き受けるIAMロール |
-| **開発環境** | developブランチへのpushでデプロイされるAWS環境（リソース名サフィックス `-dev`） |
-| **本番環境** | mainブランチへのpushでデプロイされるAWS環境（リソース名サフィックス `-prod`） |
+| **開発環境** | developブランチへのpushでデプロイされるAWS環境（リソース名サフィックス `-dev-<UserName>`） |
+| **本番環境** | mainブランチへのpushでデプロイされるAWS環境（リソース名サフィックス `-prod-<UserName>`） |
+| **UserName** | 受講者ごとの識別子（英小文字＋数字、1〜8文字）。全リソース名の末尾サフィックスに付与し、同一アカウント・同一リージョンでの共存を可能にする |

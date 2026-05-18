@@ -18,11 +18,11 @@ graph LR
     end
 
     subgraph "開発環境"
-        APIGW_DEV[API Gateway<br/>dev] --> Lambda_DEV[Lambda<br/>cities-api-dev]
+        APIGW_DEV[API Gateway<br/>dev] --> Lambda_DEV[Lambda<br/>cities-api-dev-userN]
     end
 
     subgraph "本番環境"
-        APIGW_PROD[API Gateway<br/>prod] --> Lambda_PROD[Lambda<br/>cities-api-prod]
+        APIGW_PROD[API Gateway<br/>prod] --> Lambda_PROD[Lambda<br/>cities-api-prod-userN]
     end
 
     CFN --> APIGW_DEV
@@ -157,6 +157,44 @@ graph LR
 
 - 環境分離はパラメータ `Environment`（dev / prod）で制御する
 - リソース名に Environment を付与して開発・本番を分離する
+- 複数ユーザー共存のためパラメータ `UserName` を持ち、リソース名の末尾にサフィックスとして付与する
+
+### リソース命名規約
+
+同一AWSアカウント・同一リージョンで複数ユーザーが共存できるよう、リソース名の末尾に `<UserName>` をサフィックスとして付ける。`Environment`（dev/prod）サフィックスがある場合は、`<Environment>` の後ろに `<UserName>` を置く。
+
+#### setup.yaml が作るリソース
+
+| リソース | 命名 |
+|---|---|
+| CodeCommit リポジトリ | `cities-api-<UserName>` |
+| S3 バケット | `cities-api-artifacts-<Acct>-<Region>-<UserName>` |
+| build-role | `cities-api-build-role-<UserName>` |
+| pipeline-role | `cities-api-pipeline-role-<UserName>` |
+| deploy-role | `cities-api-deploy-role-<UserName>` |
+
+#### template.yaml が作るリソース
+
+| リソース | 命名 |
+|---|---|
+| API Gateway | `cities-api-<Environment>-<UserName>` |
+| ListCities Lambda | `cities-list-<Environment>-<UserName>` |
+| GetCity Lambda | `cities-get-<Environment>-<UserName>` |
+
+#### 受講者が手で命名するリソース
+
+| リソース | 命名 |
+|---|---|
+| 事前構築 CFN スタック | `cities-api-setup-<UserName>` |
+| CodeBuild プロジェクト | `cities-api-build-<Environment>-<UserName>` |
+| CodePipeline | `cities-api-pipeline-<Environment>-<UserName>` |
+| デプロイ先 CFN スタック | `cities-api-<Environment>-<UserName>` |
+
+#### UserName の制約
+
+- 英小文字＋数字のみ（`^[a-z0-9]+$`）
+- 1〜8 文字
+- S3 バケット名のグローバル一意制約に合わせた文字種、および IAM ロール名 64 文字制限のマージン確保のための長さ制限
 
 ### buildspec.yml 設計
 
