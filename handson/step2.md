@@ -85,6 +85,10 @@ git switch main
 git push -u origin main
 ```
 
+次の作業に備えて、作業ブランチはdevelopに戻しておきます。
+```bash
+git switch develop
+```
 ### 4. CodeCommitコンソールでpushを確認する
 
 1. AWSマネジメントコンソールで **CodeCommit** を開きます
