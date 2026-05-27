@@ -72,7 +72,7 @@ git remote add origin <CodeCommitCloneUrlHttp の値>
 `develop` ブランチを作って push します：
 
 ```bash
-git checkout -b develop
+git switch -c develop
 git push -u origin develop
 ```
 
